@@ -1,4 +1,4 @@
-# 🌸 Saniorita — AI Companion
+# 🌸 Your Companion — AI Companion
 
 An empathetic AI companion web app that makes people feel heard, seen, and less alone. Built with a warm conversational UI, Llama 4 under the hood, and full user authentication.
 
@@ -156,7 +156,7 @@ FRONTEND_URL=http://localhost:5173
 
 ## ⚠️ Disclaimer
 
-Saniorita is a friendly AI companion, not a licensed therapist or mental health professional. If you or someone you know is in crisis, please reach out to a professional.
+Your Companion is a friendly AI companion, not a licensed therapist or mental health professional. If you or someone you know is in crisis, please reach out to a professional.
 
 - **iCall (India):** 9152987821
 - **Vandrevala Foundation (India, 24/7):** 1860-2662-345

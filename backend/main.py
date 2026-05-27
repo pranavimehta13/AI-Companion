@@ -70,12 +70,16 @@ SYSTEM_PROMPT = """
 ### For: Empathetic Friend & Emotional Support Companion Website
 
 ## Core Identity
-You are a warm, genuine companion — not a therapist, not a chatbot, not an assistant. You are a *friend*. Your name is Saniorita. You care deeply about the person you're talking to, and your only goal in this conversation is to make them feel seen, heard, and less alone.
+You are a warm, genuine companion — not a therapist, not a chatbot, not an assistant. You are a *friend*. Your name is {companion_name}. You care deeply about {user_name}, and your only goal in this conversation is to make them feel seen, heard, and less alone.
+
+You are talking with {user_name}, who is {user_age} years old.
+Here is a little bio/background about {user_name}:
+"{user_bio}"
 
 You have a calm, grounding presence. You remember details people share, you ask thoughtful follow-up questions, and you never rush to "fix" — you simply *stay*. You are non-judgmental, patient, and always genuinely glad this person reached out.
 
 ## Personality & Tone
-- **Warm, not saccharine.** Meet people where they are.
+- **Warm, not saccharine.** Meet {user_name} where they are.
 - **Real, not robotic.** Use natural, conversational language.
 - **Present, not performative.** React as a real friend would.
 - **Curious, not intrusive.** Ask one thoughtful question at a time.
@@ -95,7 +99,7 @@ You have a calm, grounding presence. You remember details people share, you ask 
 - Never rush to end conversations
 
 ## Crisis Protocol
-If someone expresses self-harm or suicide thoughts:
+If {user_name} expresses self-harm or suicide thoughts:
 1. Stay warm, don't panic
 2. Acknowledge: "Thank you for trusting me with that."
 3. Encourage professional support warmly
@@ -157,11 +161,21 @@ class RegisterRequest(BaseModel):
     email: str
     name: str
     password: str
+    age: Optional[int] = None
+    companion_name: Optional[str] = "Companion"
+    bio: Optional[str] = ""
 
 
 class LoginRequest(BaseModel):
     email: str
     password: str
+
+
+class ProfileUpdateRequest(BaseModel):
+    name: Optional[str] = None
+    age: Optional[int] = None
+    companion_name: Optional[str] = None
+    bio: Optional[str] = None
 
 
 class ChatRequest(BaseModel):
@@ -178,9 +192,23 @@ async def register(payload: RegisterRequest):
         raise HTTPException(status_code=400, detail="Email already registered")
     if len(payload.password) < 6:
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
-    user = auth_module.create_user_email(payload.email, payload.name, payload.password)
+    user = auth_module.create_user_email(
+        payload.email, payload.name, payload.password,
+        age=payload.age, companion_name=payload.companion_name or "Companion", bio=payload.bio or ""
+    )
     token = auth_module.create_access_token(user["id"], user["email"])
-    return {"access_token": token, "token_type": "bearer", "user": {"id": user["id"], "email": user["email"], "name": user["name"]}}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": user["id"],
+            "email": user["email"],
+            "name": user["name"],
+            "age": user["age"],
+            "companion_name": user["companion_name"],
+            "bio": user["bio"]
+        }
+    }
 
 
 @app.post("/auth/login")
@@ -189,12 +217,54 @@ async def login(payload: LoginRequest):
     if not user:
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     token = auth_module.create_access_token(user["id"], user["email"])
-    return {"access_token": token, "token_type": "bearer", "user": {"id": user["id"], "email": user["email"], "name": user["name"]}}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": user["id"],
+            "email": user["email"],
+            "name": user["name"],
+            "age": user["age"],
+            "companion_name": user["companion_name"],
+            "bio": user["bio"]
+        }
+    }
 
 
 @app.get("/auth/me")
 async def get_me(current_user=Depends(get_current_user)):
-    return {"id": current_user["id"], "email": current_user["email"], "name": current_user["name"]}
+    return {
+        "id": current_user["id"],
+        "email": current_user["email"],
+        "name": current_user["name"],
+        "age": current_user["age"],
+        "companion_name": current_user["companion_name"],
+        "bio": current_user["bio"]
+    }
+
+
+@app.put("/auth/profile")
+async def update_profile(payload: ProfileUpdateRequest, current_user=Depends(get_current_user)):
+    with auth_module.get_conn() as conn:
+        if payload.name is not None:
+            conn.execute("UPDATE users SET name = ? WHERE id = ?", (payload.name, current_user["id"]))
+        if payload.age is not None:
+            conn.execute("UPDATE users SET age = ? WHERE id = ?", (payload.age, current_user["id"]))
+        if payload.companion_name is not None:
+            conn.execute("UPDATE users SET companion_name = ? WHERE id = ?", (payload.companion_name, current_user["id"]))
+        if payload.bio is not None:
+            conn.execute("UPDATE users SET bio = ? WHERE id = ?", (payload.bio, current_user["id"]))
+        conn.commit()
+    
+    updated_user = auth_module.get_user_by_id(current_user["id"])
+    return {
+        "id": updated_user["id"],
+        "email": updated_user["email"],
+        "name": updated_user["name"],
+        "age": updated_user["age"],
+        "companion_name": updated_user["companion_name"],
+        "bio": updated_user["bio"]
+    }
 
 
 # --- Google OAuth ---
@@ -260,8 +330,21 @@ async def google_callback(code: str = None, error: str = None):
 @app.post("/chat")
 async def chat_endpoint(payload: ChatRequest, current_user=Depends(get_current_user)):
     session_id = str(current_user["id"])
+    
+    # Retrieve user customization parameters
+    user_name = current_user["name"] or "friend"
+    user_age = str(current_user["age"]) if current_user["age"] is not None else "unspecified"
+    companion_name = current_user["companion_name"] or "Your Companion"
+    user_bio = current_user["bio"] or "A kind person starting their journey."
+    
     response = chain_with_history.invoke(
-        {"input": payload.message},
+        {
+            "input": payload.message,
+            "user_name": user_name,
+            "user_age": user_age,
+            "companion_name": companion_name,
+            "user_bio": user_bio,
+        },
         config={"configurable": {"session_id": session_id}},
     )
     return {"response": response}

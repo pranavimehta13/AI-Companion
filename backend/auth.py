@@ -39,14 +39,23 @@ def init_db():
     with get_conn() as conn:
         conn.execute("""
             CREATE TABLE IF NOT EXISTS users (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                email         TEXT    UNIQUE NOT NULL,
-                name          TEXT    NOT NULL DEFAULT '',
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                email           TEXT    UNIQUE NOT NULL,
+                name            TEXT    NOT NULL DEFAULT '',
                 hashed_password TEXT,
-                google_id     TEXT    UNIQUE,
-                created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
+                google_id       TEXT    UNIQUE,
+                age             INTEGER,
+                companion_name  TEXT    DEFAULT 'Companion',
+                bio             TEXT    DEFAULT '',
+                created_at      TEXT    NOT NULL DEFAULT (datetime('now'))
             )
         """)
+        # Run migrations to add columns if they don't exist in an existing DB
+        for col, col_type in [("age", "INTEGER"), ("companion_name", "TEXT DEFAULT 'Companion'"), ("bio", "TEXT DEFAULT ''")]:
+            try:
+                conn.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type}")
+            except sqlite3.OperationalError:
+                pass  # Column already exists
         conn.commit()
 
 
@@ -69,12 +78,12 @@ def get_user_by_google_id(google_id: str) -> Optional[sqlite3.Row]:
         return conn.execute("SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
 
 
-def create_user_email(email: str, name: str, password: str) -> sqlite3.Row:
+def create_user_email(email: str, name: str, password: str, age: Optional[int] = None, companion_name: str = "Companion", bio: str = "") -> sqlite3.Row:
     hashed = pwd_ctx.hash(password)
     with get_conn() as conn:
         conn.execute(
-            "INSERT INTO users (email, name, hashed_password) VALUES (?, ?, ?)",
-            (email, name, hashed),
+            "INSERT INTO users (email, name, hashed_password, age, companion_name, bio) VALUES (?, ?, ?, ?, ?, ?)",
+            (email, name, hashed, age, companion_name, bio),
         )
         conn.commit()
     return get_user_by_email(email)
