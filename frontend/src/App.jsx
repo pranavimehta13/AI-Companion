@@ -4,7 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 // Config
 // ---------------------------------------------------------------------------
 const COMPANION_NAME = "Your Companion";
-const API = "http://localhost:8000";
+// Reads from .env (VITE_API_URL=...). Falls back to localhost for local dev.
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // ---------------------------------------------------------------------------
 // Tiny auth helpers (localStorage)
