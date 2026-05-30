@@ -1,4 +1,3 @@
-streamlit
 langchain
 langchain-core
 langchain-groq
@@ -9,3 +8,5 @@ python-dotenv
 passlib[bcrypt]
 python-jose[cryptography]
 python-multipart
+psycopg2-binary
+httpx
