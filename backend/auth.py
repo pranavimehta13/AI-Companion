@@ -47,11 +47,23 @@ def init_db():
                 age             INTEGER,
                 companion_name  TEXT    DEFAULT 'Companion',
                 bio             TEXT    DEFAULT '',
+                personality     TEXT    DEFAULT 'warm_friendly',
                 created_at      TEXT    NOT NULL DEFAULT (datetime('now'))
             )
         """)
+        # Persistent chat message history — survives server restarts
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id    INTEGER NOT NULL,
+                role       TEXT    NOT NULL,
+                content    TEXT    NOT NULL,
+                created_at TEXT    NOT NULL DEFAULT (datetime('now')),
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """)
         # Run migrations to add columns if they don't exist in an existing DB
-        for col, col_type in [("age", "INTEGER"), ("companion_name", "TEXT DEFAULT 'Companion'"), ("bio", "TEXT DEFAULT ''")]:
+        for col, col_type in [("age", "INTEGER"), ("companion_name", "TEXT DEFAULT 'Companion'"), ("bio", "TEXT DEFAULT ''"), ("personality", "TEXT DEFAULT 'warm_friendly'")]:
             try:
                 conn.execute(f"ALTER TABLE users ADD COLUMN {col} {col_type}")
             except sqlite3.OperationalError:
@@ -78,12 +90,12 @@ def get_user_by_google_id(google_id: str) -> Optional[sqlite3.Row]:
         return conn.execute("SELECT * FROM users WHERE google_id = ?", (google_id,)).fetchone()
 
 
-def create_user_email(email: str, name: str, password: str, age: Optional[int] = None, companion_name: str = "Companion", bio: str = "") -> sqlite3.Row:
+def create_user_email(email: str, name: str, password: str, age: Optional[int] = None, companion_name: str = "Companion", bio: str = "", personality: str = "warm_friendly") -> sqlite3.Row:
     hashed = pwd_ctx.hash(password)
     with get_conn() as conn:
         conn.execute(
-            "INSERT INTO users (email, name, hashed_password, age, companion_name, bio) VALUES (?, ?, ?, ?, ?, ?)",
-            (email, name, hashed, age, companion_name, bio),
+            "INSERT INTO users (email, name, hashed_password, age, companion_name, bio, personality) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (email, name, hashed, age, companion_name, bio, personality),
         )
         conn.commit()
     return get_user_by_email(email)

@@ -3,21 +3,21 @@ import { useState, useRef, useEffect, useCallback } from "react";
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
-const COMPANION_NAME = "Your Companion";
+const COMPANION_NAME = "Confide";
 // Reads from .env (VITE_API_URL=...). Falls back to localhost for local dev.
 const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // ---------------------------------------------------------------------------
 // Tiny auth helpers (localStorage)
 // ---------------------------------------------------------------------------
-const getToken = () => localStorage.getItem("companion_token");
-const setToken = (t) => localStorage.setItem("companion_token", t);
-const removeToken = () => localStorage.removeItem("companion_token");
+const getToken = () => localStorage.getItem("confide_token");
+const setToken = (t) => localStorage.setItem("confide_token", t);
+const removeToken = () => localStorage.removeItem("confide_token");
 const getUser = () => {
-  try { return JSON.parse(localStorage.getItem("companion_user") || "null"); } catch { return null; }
+  try { return JSON.parse(localStorage.getItem("confide_user") || "null"); } catch { return null; }
 };
-const setUser = (u) => localStorage.setItem("companion_user", JSON.stringify(u));
-const removeUser = () => localStorage.removeItem("companion_user");
+const setUser = (u) => localStorage.setItem("confide_user", JSON.stringify(u));
+const removeUser = () => localStorage.removeItem("confide_user");
 
 // ---------------------------------------------------------------------------
 // Google OAuth callback handler — runs when redirected back from Google
@@ -75,9 +75,9 @@ const GlobalStyle = () => (
 function Blobs() {
   return (
     <>
-      <div style={{ position:"fixed", top:-80, right:-80, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(247,202,201,0.4) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }} />
-      <div style={{ position:"fixed", bottom:-60, left:-60, width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(201,228,222,0.35) 0%, transparent 70%)", pointerEvents:"none", zIndex:0 }} />
-      <div style={{ position:"fixed", top:"40%", left:"70%", width:250, height:250, borderRadius:"50%", background:"radial-gradient(circle, rgba(240,215,240,0.3) 0%, transparent 75%)", pointerEvents:"none", zIndex:0 }} />
+      <div style={{ position: "fixed", top: -80, right: -80, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(247,202,201,0.4) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "fixed", bottom: -60, left: -60, width: 350, height: 350, borderRadius: "50%", background: "radial-gradient(circle, rgba(201,228,222,0.35) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "fixed", top: "40%", left: "70%", width: 250, height: 250, borderRadius: "50%", background: "radial-gradient(circle, rgba(240,215,240,0.3) 0%, transparent 75%)", pointerEvents: "none", zIndex: 0 }} />
     </>
   );
 }
@@ -88,39 +88,39 @@ function Blobs() {
 function Navbar({ onNavigate, currentPage, onLogout, user }) {
   return (
     <nav style={{
-      display:"flex", alignItems:"center", justifyContent:"space-between",
-      padding:"18px 5%", background:"rgba(255, 252, 250, 0.75)",
-      backdropFilter:"blur(12px)", borderBottom:"1px solid rgba(240,220,215,0.6)",
-      position:"sticky", top:0, zIndex:100, transition:"all 0.3s"
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      padding: "18px 5%", background: "rgba(255, 252, 250, 0.75)",
+      backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(240,220,215,0.6)",
+      position: "sticky", top: 0, zIndex: 100, transition: "all 0.3s"
     }}>
-      <div 
+      <div
         onClick={() => onNavigate(user ? "chat" : "landing")}
-        style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }}
+        style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
       >
-        <div style={{ width:38, height:38, borderRadius:"50%", background:"linear-gradient(135deg, #f7cac9, #c9e4de)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:18, fontWeight:700, color:"#8a6f6f" }}>
+        <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg, #f7cac9, #c9e4de)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "#8a6f6f" }}>
           🌸
         </div>
-        <span style={{ fontFamily:"'Outfit', sans-serif", fontSize:20, fontWeight:600, letterSpacing:"-0.5px", color:"#4a3232" }}>
+        <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 20, fontWeight: 600, letterSpacing: "-0.5px", color: "#4a3232" }}>
           {COMPANION_NAME}
         </span>
       </div>
 
-      <div style={{ display:"flex", alignItems:"center", gap:15 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
         {user ? (
           <>
-            <span style={{ fontSize:14, color:"#8a6f6f" }}>
-              Hello, <strong style={{ color:"#c07070" }}>{user.name}</strong>
+            <span style={{ fontSize: 14, color: "#8a6f6f" }}>
+              Hello, <strong style={{ color: "#c07070" }}>{user.name}</strong>
             </span>
-            <button 
+            <button
               onClick={onLogout}
               style={{
-                padding:"8px 16px", borderRadius:10, border:"1px solid #f5c5c5",
-                background:"#fef0f0", color:"#c07070", cursor:"pointer",
-                fontFamily:"'DM Sans', sans-serif", fontSize:13, fontWeight:500,
-                transition:"all 0.2s"
+                padding: "8px 16px", borderRadius: 10, border: "1px solid #f5c5c5",
+                background: "#fef0f0", color: "#c07070", cursor: "pointer",
+                fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+                transition: "all 0.2s"
               }}
-              onMouseOver={e=>e.currentTarget.style.background="#fce5e5"}
-              onMouseOut={e=>e.currentTarget.style.background="#fef0f0"}
+              onMouseOver={e => e.currentTarget.style.background = "#fce5e5"}
+              onMouseOut={e => e.currentTarget.style.background = "#fef0f0"}
             >
               Sign out
             </button>
@@ -128,31 +128,31 @@ function Navbar({ onNavigate, currentPage, onLogout, user }) {
         ) : (
           <>
             {currentPage !== "landing" && (
-              <button 
+              <button
                 onClick={() => onNavigate("landing")}
-                style={{ background:"none", border:"none", color:"#8a6f6f", fontSize:14, cursor:"pointer", fontWeight:500, fontFamily:"'DM Sans', sans-serif" }}
+                style={{ background: "none", border: "none", color: "#8a6f6f", fontSize: 14, cursor: "pointer", fontWeight: 500, fontFamily: "'DM Sans', sans-serif" }}
               >
                 Home
               </button>
             )}
-            <button 
+            <button
               onClick={() => onNavigate("login")}
               style={{
-                background:"none", border:"none", color:"#c07070", fontSize:14, cursor:"pointer", fontWeight:500,
-                padding:"8px 14px", fontFamily:"'DM Sans', sans-serif"
+                background: "none", border: "none", color: "#c07070", fontSize: 14, cursor: "pointer", fontWeight: 500,
+                padding: "8px 14px", fontFamily: "'DM Sans', sans-serif"
               }}
             >
               Sign In
             </button>
-            <button 
+            <button
               onClick={() => onNavigate("register")}
               style={{
-                padding:"8px 18px", borderRadius:10, border:"none",
-                background:"linear-gradient(135deg, #f7cac9, #e8b4b8)",
-                color:"#5a3a3a", cursor:"pointer", fontWeight:500,
-                fontFamily:"'DM Sans', sans-serif", fontSize:14,
-                boxShadow:"0 2px 10px rgba(232,180,184,0.3)",
-                transition:"all 0.2s"
+                padding: "8px 18px", borderRadius: 10, border: "none",
+                background: "linear-gradient(135deg, #f7cac9, #e8b4b8)",
+                color: "#5a3a3a", cursor: "pointer", fontWeight: 500,
+                fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+                boxShadow: "0 2px 10px rgba(232,180,184,0.3)",
+                transition: "all 0.2s"
               }}
               onMouseOver={e => e.currentTarget.style.transform = "translateY(-1px)"}
               onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}
@@ -171,120 +171,177 @@ function Navbar({ onNavigate, currentPage, onLogout, user }) {
 // ---------------------------------------------------------------------------
 function LandingPage({ onNavigate }) {
   return (
-    <div style={{ display:"flex", flexDirection:"column", minHeight:"calc(100vh - 75px)", position:"relative", overflow:"hidden" }}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "calc(100vh - 75px)", position: "relative", overflowX: "hidden" }}>
       <Blobs />
-      
+
       {/* Hero Section */}
       <div style={{
-        textAlign:"center", padding:"80px 20px 40px", maxWidth:800, margin:"0 auto",
-        zIndex:1, animation:"slideIn 0.5s ease"
+        textAlign: "center", padding: "80px 20px 40px", maxWidth: 800, margin: "0 auto",
+        zIndex: 1, animation: "slideIn 0.5s ease"
       }}>
         <div style={{
-          display:"inline-flex", alignItems:"center", gap:8, padding:"6px 14px",
-          background:"rgba(255,255,255,0.7)", border:"1px solid rgba(240,220,215,0.8)",
-          borderRadius:30, fontSize:13, color:"#b08080", fontWeight:500, marginBottom:24,
-          boxShadow:"0 2px 8px rgba(0,0,0,0.03)"
+          display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px",
+          background: "rgba(255,255,255,0.7)", border: "1px solid rgba(240,220,215,0.8)",
+          borderRadius: 30, fontSize: 13, color: "#b08080", fontWeight: 500, marginBottom: 24,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.03)"
         }}>
           <span>🌸</span> Empathetic. Secure. Customizable.
         </div>
-        
+
         <h1 style={{
-          fontFamily:"'Outfit', sans-serif", fontSize:54, fontWeight:700,
-          color:"#4a3232", lineHeight:1.15, letterSpacing:"-1.5px", marginBottom:20
+          fontFamily: "'Outfit', sans-serif", fontSize: 54, fontWeight: 700,
+          color: "#4a3232", lineHeight: 1.15, letterSpacing: "-1.5px", marginBottom: 20
         }}>
-          Meet <span style={{ background:"linear-gradient(135deg, #e89898 0%, #aa7a99 100%)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Your Companion</span>
+          Meet <span style={{ background: "linear-gradient(135deg, #e89898 0%, #aa7a99 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Confide</span>
         </h1>
-        
+
         <p style={{
-          fontSize:19, color:"#7a6060", lineHeight:1.6, maxWidth:640, margin:"0 auto 36px",
-          fontWeight:300
+          fontSize: 19, color: "#7a6060", lineHeight: 1.6, maxWidth: 640, margin: "0 auto 36px",
+          fontWeight: 300
         }}>
           A warm, safe space where you can share your thoughts, be truly heard, and never feel alone. Your private companion adapts to your life, respects your goals, and is always here for you.
         </p>
 
-        <div style={{ display:"flex", justifyContent:"center", gap:16, flexWrap:"wrap" }}>
-          <button 
+        <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+          <button
             onClick={() => onNavigate("register")}
             style={{
-              padding:"15px 32px", borderRadius:14, border:"none",
-              background:"linear-gradient(135deg, #f7cac9, #e8b4b8)",
-              color:"#5a3a3a", fontSize:16, fontWeight:600, cursor:"pointer",
-              boxShadow:"0 4px 18px rgba(232,180,184,0.5)", transition:"all 0.2s"
+              padding: "15px 32px", borderRadius: 14, border: "none",
+              background: "linear-gradient(135deg, #f7cac9, #e8b4b8)",
+              color: "#5a3a3a", fontSize: 16, fontWeight: 600, cursor: "pointer",
+              boxShadow: "0 4px 18px rgba(232,180,184,0.5)", transition: "all 0.2s"
             }}
-            onMouseOver={e=>e.currentTarget.style.transform="translateY(-2px)"}
-            onMouseOut={e=>e.currentTarget.style.transform="translateY(0)"}
+            onMouseOver={e => e.currentTarget.style.transform = "translateY(-2px)"}
+            onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}
           >
             Create Your Companion
           </button>
-          <button 
+          <button
             onClick={() => onNavigate("login")}
             style={{
-              padding:"15px 32px", borderRadius:14, border:"1px solid #e8d0d0",
-              background:"rgba(255,255,255,0.7)",
-              color:"#7a5a5a", fontSize:16, fontWeight:500, cursor:"pointer",
-              transition:"all 0.2s", backdropFilter:"blur(5px)"
+              padding: "15px 32px", borderRadius: 14, border: "1px solid #e8d0d0",
+              background: "rgba(255,255,255,0.7)",
+              color: "#7a5a5a", fontSize: 16, fontWeight: 500, cursor: "pointer",
+              transition: "all 0.2s", backdropFilter: "blur(5px)"
             }}
-            onMouseOver={e=>e.currentTarget.style.background="#fff5f3"}
-            onMouseOut={e=>e.currentTarget.style.background="rgba(255,255,255,0.7)"}
+            onMouseOver={e => e.currentTarget.style.background = "#fff5f3"}
+            onMouseOut={e => e.currentTarget.style.background = "rgba(255,255,255,0.7)"}
           >
             Welcome Back
           </button>
+        </div>
+
+        {/* Scroll hint */}
+        <div style={{ marginTop: 48, display: "flex", flexDirection: "column", alignItems: "center", gap: 6, opacity: 0.5 }}>
+          <span style={{ fontSize: 12, color: "#b08080", fontFamily: "'DM Sans', sans-serif" }}>scroll to explore</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c0a0a0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </div>
       </div>
 
       {/* Feature cards Grid */}
       <div style={{
-        display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(250px, 1fr))",
-        gap:24, maxWidth:1024, margin:"40px auto 80px", padding:"0 24px", zIndex:1,
-        animation:"fadeIn 0.8s ease"
+        display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        gap: 24, maxWidth: 1024, margin: "40px auto 0", padding: "0 24px", zIndex: 1,
+        animation: "fadeIn 0.8s ease"
       }}>
         {[
-          { icon:"💬", title:"Warm Active Listening", desc:"Not an assistant trying to manage your schedule, but a genuine friend who listens, validates your feelings, and stays by your side." },
-          { icon:"✨", title:"Deep Customization", desc:"You name your companion and share your background. Their personality, greeting, and memory adapt specifically to who you are." },
-          { icon:"🔒", title:"100% Confidential & Secure", desc:"Your thoughts are locked. Conversation data is secure, and you hold complete control to clear your chat history at any moment." }
+          { icon: "💬", title: "Warm Active Listening", desc: "Not an assistant trying to manage your schedule, but a genuine friend who listens, validates your feelings, and stays by your side." },
+          { icon: "✨", title: "Deep Customization", desc: "You name your companion and share your background. Their personality, greeting, and memory adapt specifically to who you are." },
+          { icon: "🔒", title: "100% Confidential & Secure", desc: "Your thoughts are locked. Conversation data is secure, and you hold complete control to clear your chat history at any moment." }
         ].map((feat, idx) => (
           <div key={idx} style={{
-            background:"rgba(255, 252, 250, 0.85)", backdropFilter:"blur(10px)",
-            borderRadius:20, border:"1px solid rgba(240,220,215,0.6)",
-            padding:"28px", boxShadow:"0 4px 20px rgba(180,120,120,0.05)",
-            textAlign:"left", transition:"transform 0.2s"
+            background: "rgba(255, 252, 250, 0.85)", backdropFilter: "blur(10px)",
+            borderRadius: 20, border: "1px solid rgba(240,220,215,0.6)",
+            padding: "28px", boxShadow: "0 4px 20px rgba(180,120,120,0.05)",
+            textAlign: "left", transition: "transform 0.2s"
           }}
-          onMouseOver={e=>e.currentTarget.style.transform="translateY(-4px)"}
-          onMouseOut={e=>e.currentTarget.style.transform="translateY(0)"}
+            onMouseOver={e => e.currentTarget.style.transform = "translateY(-4px)"}
+            onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}
           >
-            <div style={{ fontSize:28, marginBottom:16 }}>{feat.icon}</div>
-            <h3 style={{ fontFamily:"'Outfit', sans-serif", fontSize:18, fontWeight:600, color:"#4a3232", marginBottom:8 }}>{feat.title}</h3>
-            <p style={{ fontSize:14, color:"#7a6060", lineHeight:1.5 }}>{feat.desc}</p>
+            <div style={{ fontSize: 28, marginBottom: 16 }}>{feat.icon}</div>
+            <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 600, color: "#4a3232", marginBottom: 8 }}>{feat.title}</h3>
+            <p style={{ fontSize: 14, color: "#7a6060", lineHeight: 1.5 }}>{feat.desc}</p>
           </div>
         ))}
       </div>
 
+      {/* How it works section */}
+      <div style={{ maxWidth: 800, margin: "80px auto 0", padding: "0 24px", zIndex: 1, textAlign: "center" }}>
+        <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: 28, color: "#4a3232", marginBottom: 8 }}>How Confide works</p>
+        <p style={{ fontSize: 14, color: "#8a7070", marginBottom: 48 }}>Three simple steps to your perfect companion</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 32 }}>
+          {[
+            { step: "01", title: "Create your account", desc: "Sign up in seconds with email or Google. No credit card needed." },
+            { step: "02", title: "Design your companion", desc: "Give them a name, pick a personality, and share a little about yourself." },
+            { step: "03", title: "Start talking", desc: "Your companion remembers your conversations and adapts to who you are over time." },
+          ].map((item, idx) => (
+            <div key={idx} style={{ textAlign: "center" }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: "50%", margin: "0 auto 16px",
+                background: "linear-gradient(135deg, #f7cac9, #e8b4b8)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "'Outfit', sans-serif", fontSize: 14, fontWeight: 700, color: "#5a3a3a"
+              }}>{item.step}</div>
+              <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 16, fontWeight: 600, color: "#4a3232", marginBottom: 8 }}>{item.title}</p>
+              <p style={{ fontSize: 13, color: "#8a7070", lineHeight: 1.6 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Trust Call to Action */}
       <div style={{
-        background:"rgba(255, 250, 248, 0.9)", borderTop:"1px solid rgba(240,220,215,0.6)",
-        padding:"60px 20px", textAlign:"center", marginTop:"auto", zIndex:1
+        background: "rgba(255, 250, 248, 0.9)", borderTop: "1px solid rgba(240,220,215,0.6)",
+        padding: "60px 20px", textAlign: "center", marginTop: 80, zIndex: 1
       }}>
-        <div style={{ maxWidth:600, margin:"0 auto" }}>
-          <p style={{ fontFamily:"'DM Serif Display', serif", fontSize:26, color:"#4a3232", marginBottom:12 }}>
+        <div style={{ maxWidth: 600, margin: "0 auto" }}>
+          <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: 26, color: "#4a3232", marginBottom: 12 }}>
             A friendship designed to support you.
           </p>
-          <p style={{ fontSize:14, color:"#8a7070", lineHeight:1.6, marginBottom:24 }}>
-            Create your space, specify your companion's details, and speak your mind without pressure. 
+          <p style={{ fontSize: 14, color: "#8a7070", lineHeight: 1.6, marginBottom: 24 }}>
+            Create your space, design your companion's identity, and speak your mind without pressure.
           </p>
-          <button 
+          <button
             onClick={() => onNavigate("register")}
             style={{
-              padding:"12px 24px", borderRadius:10, border:"none",
-              background:"#5a3a3a", color:"#ffffff", fontSize:14, fontWeight:500, cursor:"pointer",
-              transition:"all 0.2s", boxShadow:"0 4px 12px rgba(90,58,58,0.2)"
+              padding: "12px 24px", borderRadius: 10, border: "none",
+              background: "#5a3a3a", color: "#ffffff", fontSize: 14, fontWeight: 500, cursor: "pointer",
+              transition: "all 0.2s", boxShadow: "0 4px 12px rgba(90,58,58,0.2)"
             }}
-            onMouseOver={e=>e.currentTarget.style.background="#472d2d"}
-            onMouseOut={e=>e.currentTarget.style.background="#5a3a3a"}
+            onMouseOver={e => e.currentTarget.style.background = "#472d2d"}
+            onMouseOut={e => e.currentTarget.style.background = "#5a3a3a"}
           >
             Get Started in 1 Minute
           </button>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer style={{
+        borderTop: "1px solid rgba(240,220,215,0.5)", padding: "32px 24px",
+        textAlign: "center", zIndex: 1, background: "rgba(255,252,250,0.6)"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #f7cac9, #c9e4de)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>🌸</div>
+          <span style={{ fontFamily: "'Outfit', sans-serif", fontSize: 16, fontWeight: 600, color: "#4a3232" }}>Confide</span>
+        </div>
+        <p style={{ fontSize: 13, color: "#b09090", marginBottom: 8 }}>
+          Your private AI companion — always here for you.
+        </p>
+        <a
+          href="mailto:pranavimehta13@gmail.com"
+          style={{ fontSize: 13, color: "#c07070", textDecoration: "none", fontFamily: "'DM Sans', sans-serif" }}
+          onMouseOver={e => e.currentTarget.style.textDecoration = "underline"}
+          onMouseOut={e => e.currentTarget.style.textDecoration = "none"}
+        >
+          pranavimehta13@gmail.com
+        </a>
+        <p style={{ fontSize: 11, color: "#c8b8b8", marginTop: 16 }}>
+          © {new Date().getFullYear()} Confide. Made with 🌸
+        </p>
+      </footer>
     </div>
   );
 }
@@ -292,7 +349,7 @@ function LandingPage({ onNavigate }) {
 // ---------------------------------------------------------------------------
 // Input component
 // ---------------------------------------------------------------------------
-function AuthInput({ type="text", placeholder, value, onChange, autoComplete, disabled=false }) {
+function AuthInput({ type = "text", placeholder, value, onChange, autoComplete, disabled = false }) {
   return (
     <input
       type={type}
@@ -302,14 +359,14 @@ function AuthInput({ type="text", placeholder, value, onChange, autoComplete, di
       autoComplete={autoComplete}
       disabled={disabled}
       style={{
-        width:"100%", padding:"13px 16px", borderRadius:12,
-        border:"1px solid #f0ddd8", background:"#fff8f6",
-        fontSize:15, color:"#4a3232",
-        fontFamily:"'DM Sans', sans-serif",
-        transition:"border-color 0.2s",
+        width: "100%", padding: "13px 16px", borderRadius: 12,
+        border: "1px solid #f0ddd8", background: "#fff8f6",
+        fontSize: 15, color: "#4a3232",
+        fontFamily: "'DM Sans', sans-serif",
+        transition: "border-color 0.2s",
       }}
-      onFocus={e => e.target.style.borderColor="#e8a0a0"}
-      onBlur={e => e.target.style.borderColor="#f0ddd8"}
+      onFocus={e => e.target.style.borderColor = "#e8a0a0"}
+      onBlur={e => e.target.style.borderColor = "#f0ddd8"}
     />
   );
 }
@@ -322,23 +379,23 @@ function GoogleButton({ label }) {
     <a
       href={`${API}/auth/google`}
       style={{
-        display:"flex", alignItems:"center", justifyContent:"center", gap:10,
-        padding:"12px 20px", borderRadius:12,
-        border:"1px solid #e8d0d0", background:"#ffffff",
-        color:"#4a3232", fontSize:14, fontWeight:500,
-        fontFamily:"'DM Sans', sans-serif",
-        textDecoration:"none", cursor:"pointer",
-        transition:"all 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.06)",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+        padding: "12px 20px", borderRadius: 12,
+        border: "1px solid #e8d0d0", background: "#ffffff",
+        color: "#4a3232", fontSize: 14, fontWeight: 500,
+        fontFamily: "'DM Sans', sans-serif",
+        textDecoration: "none", cursor: "pointer",
+        transition: "all 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
       }}
-      onMouseOver={e => { e.currentTarget.style.background="#fff5f3"; e.currentTarget.style.borderColor="#d4a0a0"; }}
-      onMouseOut={e => { e.currentTarget.style.background="#ffffff"; e.currentTarget.style.borderColor="#e8d0d0"; }}
+      onMouseOver={e => { e.currentTarget.style.background = "#fff5f3"; e.currentTarget.style.borderColor = "#d4a0a0"; }}
+      onMouseOut={e => { e.currentTarget.style.background = "#ffffff"; e.currentTarget.style.borderColor = "#e8d0d0"; }}
     >
       <svg width="18" height="18" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.1 0 5.6 1.1 7.6 2.8l5.7-5.7C33.5 3.5 29 1.5 24 1.5 14.9 1.5 7.1 7 3.6 14.8l6.7 5.2C12 14.1 17.5 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.5 24c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-16.4z"/>
-        <path fill="#FBBC05" d="M10.3 28.6A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.6L3.6 14.2A23 23 0 0 0 1 24c0 3.7.9 7.2 2.5 10.3l6.8-5.7z"/>
-        <path fill="#34A853" d="M24 46.5c5 0 9.2-1.6 12.3-4.4l-7.4-5.7c-1.7 1.1-3.8 1.8-6.4 1.8-5.4 0-10-3.6-11.7-8.6l-6.7 5.2C7 41.3 14.9 46.5 24 46.5z"/>
-        <path fill="none" d="M0 0h48v48H0z"/>
+        <path fill="#EA4335" d="M24 9.5c3.1 0 5.6 1.1 7.6 2.8l5.7-5.7C33.5 3.5 29 1.5 24 1.5 14.9 1.5 7.1 7 3.6 14.8l6.7 5.2C12 14.1 17.5 9.5 24 9.5z" />
+        <path fill="#4285F4" d="M46.5 24c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.7c4.3-4 6.8-9.9 6.8-16.4z" />
+        <path fill="#FBBC05" d="M10.3 28.6A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.1.8-4.6L3.6 14.2A23 23 0 0 0 1 24c0 3.7.9 7.2 2.5 10.3l6.8-5.7z" />
+        <path fill="#34A853" d="M24 46.5c5 0 9.2-1.6 12.3-4.4l-7.4-5.7c-1.7 1.1-3.8 1.8-6.4 1.8-5.4 0-10-3.6-11.7-8.6l-6.7 5.2C7 41.3 14.9 46.5 24 46.5z" />
+        <path fill="none" d="M0 0h48v48H0z" />
       </svg>
       {label}
     </a>
@@ -346,14 +403,56 @@ function GoogleButton({ label }) {
 }
 
 // ---------------------------------------------------------------------------
+// Personality Picker
+// ---------------------------------------------------------------------------
+const PERSONALITIES = [
+  { value: "smart_sassy", label: "Smart & Sassy", emoji: "✨", desc: "Witty, clever, a little cheeky" },
+  { value: "warm_friendly", label: "Warm & Friendly", emoji: "🌸", desc: "Kind and supportive like a best friend" },
+  { value: "calm_wise", label: "Calm & Wise", emoji: "🌿", desc: "Thoughtful and measured like a mentor" },
+  { value: "playful_goofy", label: "Playful & Goofy", emoji: "🎉", desc: "Silly, fun, loves jokes and banter" },
+  { value: "motivating_bold", label: "Motivating & Bold", emoji: "🔥", desc: "Energetic, hypes you up, pushes you forward" },
+  { value: "soft_empathetic", label: "Soft & Empathetic", emoji: "💙", desc: "Gentle, emotionally aware, great listener" },
+];
+
+function PersonalityPicker({ value, onChange }) {
+  return (
+    <div>
+      <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 8 }}>COMPANION'S PERSONALITY</label>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        {PERSONALITIES.map(p => {
+          const selected = value === p.value;
+          return (
+            <button
+              key={p.value}
+              onClick={() => onChange(p.value)}
+              style={{
+                padding: "10px 12px", borderRadius: 12, border: `2px solid ${selected ? "#e8b4b8" : "#f0ddd8"}`,
+                background: selected ? "linear-gradient(135deg, #fff0f0, #fde8ec)" : "#fff8f6",
+                cursor: "pointer", textAlign: "left", transition: "all 0.2s",
+                boxShadow: selected ? "0 2px 10px rgba(232,180,184,0.3)" : "none",
+              }}
+            >
+              <div style={{ fontSize: 16, marginBottom: 3 }}>{p.emoji}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: selected ? "#c07070" : "#5a3a3a", fontFamily: "'DM Sans', sans-serif" }}>{p.label}</div>
+              <div style={{ fontSize: 10, color: "#b09090", lineHeight: 1.3, marginTop: 2 }}>{p.desc}</div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
+// ---------------------------------------------------------------------------
 // Divider
 // ---------------------------------------------------------------------------
 function OrDivider() {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:12, margin:"4px 0" }}>
-      <div style={{ flex:1, height:1, background:"#f0ddd8" }} />
-      <span style={{ fontSize:12, color:"#c0a8a8", fontFamily:"'DM Sans', sans-serif" }}>or</span>
-      <div style={{ flex:1, height:1, background:"#f0ddd8" }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "4px 0" }}>
+      <div style={{ flex: 1, height: 1, background: "#f0ddd8" }} />
+      <span style={{ fontSize: 12, color: "#c0a8a8", fontFamily: "'DM Sans', sans-serif" }}>or</span>
+      <div style={{ flex: 1, height: 1, background: "#f0ddd8" }} />
     </div>
   );
 }
@@ -367,12 +466,12 @@ function PrimaryButton({ onClick, disabled, children }) {
       onClick={onClick}
       disabled={disabled}
       style={{
-        width:"100%", padding:"13px 20px", borderRadius:12, border:"none",
+        width: "100%", padding: "13px 20px", borderRadius: 12, border: "none",
         background: disabled ? "#f0e4e0" : "linear-gradient(135deg, #f7cac9, #e8b4b8)",
         color: disabled ? "#c0a0a0" : "#5a3a3a",
-        fontSize:15, fontWeight:600, fontFamily:"'DM Sans', sans-serif",
+        fontSize: 15, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
         cursor: disabled ? "default" : "pointer",
-        transition:"all 0.2s", boxShadow: disabled ? "none" : "0 2px 12px rgba(232,180,184,0.4)",
+        transition: "all 0.2s", boxShadow: disabled ? "none" : "0 2px 12px rgba(232,180,184,0.4)",
       }}
       onMouseOver={e => { if (!disabled) e.currentTarget.style.transform = "translateY(-1px)"; }}
       onMouseOut={e => { e.currentTarget.style.transform = "translateY(0)"; }}
@@ -388,20 +487,20 @@ function PrimaryButton({ onClick, disabled, children }) {
 function AuthCard({ children }) {
   return (
     <div style={{
-      width:"100%", maxWidth:450,
-      background:"rgba(255,252,250,0.9)", backdropFilter:"blur(12px)",
-      borderRadius:28, border:"1px solid rgba(240,220,215,0.7)",
-      boxShadow:"0 8px 40px rgba(180,120,120,0.1)",
-      padding:"36px 32px",
-      animation:"slideIn 0.4s ease",
-      position:"relative", zIndex:1,
+      width: "100%", maxWidth: 450,
+      background: "rgba(255,252,250,0.9)", backdropFilter: "blur(12px)",
+      borderRadius: 28, border: "1px solid rgba(240,220,215,0.7)",
+      boxShadow: "0 8px 40px rgba(180,120,120,0.1)",
+      padding: "36px 32px",
+      animation: "slideIn 0.4s ease",
+      position: "relative", zIndex: 1,
     }}>
-      <div style={{ textAlign:"center", marginBottom:24 }}>
-        <div style={{ width:56, height:56, borderRadius:"50%", background:"linear-gradient(135deg, #f7cac9, #c9e4de)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:22, fontWeight:700, color:"#8a6f6f", marginBottom:12 }}>
+      <div style={{ textAlign: "center", marginBottom: 24 }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, #f7cac9, #c9e4de)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 700, color: "#8a6f6f", marginBottom: 12 }}>
           🌸
         </div>
-        <p style={{ fontFamily:"'Outfit', sans-serif", fontSize:22, fontWeight:600, color:"#4a3232" }}>{COMPANION_NAME}</p>
-        <p style={{ fontSize:13, color:"#b09090", marginTop:3 }}>Your private customized companion</p>
+        <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 600, color: "#4a3232" }}>{COMPANION_NAME}</p>
+        <p style={{ fontSize: 13, color: "#b09090", marginTop: 3 }}>Your private AI companion</p>
       </div>
       {children}
     </div>
@@ -422,7 +521,7 @@ function LoginPage({ onLogin, switchToRegister, oauthError }) {
     setLoading(true); setError(null);
     try {
       const res = await fetch(`${API}/auth/login`, {
-        method:"POST", headers:{"Content-Type":"application/json"},
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
@@ -437,18 +536,18 @@ function LoginPage({ onLogin, switchToRegister, oauthError }) {
 
   return (
     <AuthCard>
-      <p style={{ fontFamily:"'Outfit', sans-serif", fontSize:18, fontWeight:500, color:"#4a3232", marginBottom:20, textAlign:"center" }}>
+      <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 500, color: "#4a3232", marginBottom: 20, textAlign: "center" }}>
         Welcome back 🌸
       </p>
 
-      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <GoogleButton label="Continue with Google" />
         <OrDivider />
-        <AuthInput type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" />
-        <AuthInput type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" />
+        <AuthInput type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
+        <AuthInput type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
 
         {error && (
-          <div style={{ background:"#fef0f0", border:"1px solid #f5c5c5", borderRadius:10, padding:"10px 14px", color:"#c07070", fontSize:13 }}>
+          <div style={{ background: "#fef0f0", border: "1px solid #f5c5c5", borderRadius: 10, padding: "10px 14px", color: "#c07070", fontSize: 13 }}>
             {error}
           </div>
         )}
@@ -458,9 +557,9 @@ function LoginPage({ onLogin, switchToRegister, oauthError }) {
         </PrimaryButton>
       </div>
 
-      <p style={{ textAlign:"center", fontSize:13, color:"#b09090", marginTop:20 }}>
+      <p style={{ textAlign: "center", fontSize: 13, color: "#b09090", marginTop: 20 }}>
         Don't have an account?{" "}
-        <button onClick={switchToRegister} style={{ background:"none", border:"none", color:"#c07070", cursor:"pointer", fontFamily:"'DM Sans', sans-serif", fontSize:13, textDecoration:"underline" }}>
+        <button onClick={switchToRegister} style={{ background: "none", border: "none", color: "#c07070", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 13, textDecoration: "underline" }}>
           Create one
         </button>
       </p>
@@ -473,17 +572,18 @@ function LoginPage({ onLogin, switchToRegister, oauthError }) {
 // ---------------------------------------------------------------------------
 function RegisterPage({ onLogin, switchToLogin }) {
   const [step, setStep] = useState(1);
-  
+
   // Step 1: Account fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  
+
   // Step 2: Personalization fields
   const [age, setAge] = useState("");
   const [companionName, setCompanionName] = useState("Companion");
   const [bio, setBio] = useState("");
+  const [personality, setPersonality] = useState("warm_friendly");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -501,12 +601,13 @@ function RegisterPage({ onLogin, switchToLogin }) {
     setLoading(true); setError(null);
     try {
       const res = await fetch(`${API}/auth/register`, {
-        method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ 
-          email, name, password, 
-          age: parseInt(age) || null, 
-          companion_name: companionName, 
-          bio 
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email, name, password,
+          age: parseInt(age) || null,
+          companion_name: companionName,
+          bio,
+          personality,
         }),
       });
       const data = await res.json();
@@ -523,20 +624,20 @@ function RegisterPage({ onLogin, switchToLogin }) {
     <AuthCard>
       {step === 1 ? (
         <>
-          <p style={{ fontFamily:"'Outfit', sans-serif", fontSize:18, fontWeight:500, color:"#4a3232", marginBottom:20, textAlign:"center" }}>
-            Create your space ✨ <span style={{ fontSize:13, color:"#b09090", fontWeight:400 }}>(Step 1 of 2)</span>
+          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 500, color: "#4a3232", marginBottom: 20, textAlign: "center" }}>
+            Create your space ✨ <span style={{ fontSize: 13, color: "#b09090", fontWeight: 400 }}>(Step 1 of 2)</span>
           </p>
 
-          <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <GoogleButton label="Sign up with Google" />
             <OrDivider />
-            <AuthInput placeholder="Your name" value={name} onChange={e=>setName(e.target.value)} autoComplete="name" />
-            <AuthInput type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" />
-            <AuthInput type="password" placeholder="Password (min 6 chars)" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="new-password" />
-            <AuthInput type="password" placeholder="Confirm password" value={confirm} onChange={e=>setConfirm(e.target.value)} autoComplete="new-password" />
+            <AuthInput placeholder="Your name" value={name} onChange={e => setName(e.target.value)} autoComplete="name" />
+            <AuthInput type="email" placeholder="Email address" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
+            <AuthInput type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" />
+            <AuthInput type="password" placeholder="Confirm password" value={confirm} onChange={e => setConfirm(e.target.value)} autoComplete="new-password" />
 
             {error && (
-              <div style={{ background:"#fef0f0", border:"1px solid #f5c5c5", borderRadius:10, padding:"10px 14px", color:"#c07070", fontSize:13 }}>
+              <div style={{ background: "#fef0f0", border: "1px solid #f5c5c5", borderRadius: 10, padding: "10px 14px", color: "#c07070", fontSize: 13 }}>
                 {error}
               </div>
             )}
@@ -546,61 +647,63 @@ function RegisterPage({ onLogin, switchToLogin }) {
             </PrimaryButton>
           </div>
 
-          <p style={{ textAlign:"center", fontSize:13, color:"#b09090", marginTop:20 }}>
+          <p style={{ textAlign: "center", fontSize: 13, color: "#b09090", marginTop: 20 }}>
             Already have an account?{" "}
-            <button onClick={switchToLogin} style={{ background:"none", border:"none", color:"#c07070", cursor:"pointer", fontFamily:"'DM Sans', sans-serif", fontSize:13, textDecoration:"underline" }}>
+            <button onClick={switchToLogin} style={{ background: "none", border: "none", color: "#c07070", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 13, textDecoration: "underline" }}>
               Sign in
             </button>
           </p>
         </>
       ) : (
         <>
-          <p style={{ fontFamily:"'Outfit', sans-serif", fontSize:18, fontWeight:500, color:"#4a3232", marginBottom:8, textAlign:"center" }}>
-            Design Your Companion 🌸 <span style={{ fontSize:13, color:"#b09090", fontWeight:400 }}>(Step 2 of 2)</span>
+          <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 500, color: "#4a3232", marginBottom: 8, textAlign: "center" }}>
+            Design Your Companion 🌸 <span style={{ fontSize: 13, color: "#b09090", fontWeight: 400 }}>(Step 2 of 2)</span>
           </p>
-          <p style={{ fontSize:12, color:"#a08888", textAlign:"center", marginBottom:20 }}>
+          <p style={{ fontSize: 12, color: "#a08888", textAlign: "center", marginBottom: 20 }}>
             Help us understand who you are and customize your new companion's identity.
           </p>
 
-          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div>
-              <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>YOUR AGE</label>
-              <AuthInput type="number" placeholder="How old are you?" value={age} onChange={e=>setAge(e.target.value)} />
+              <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>YOUR AGE</label>
+              <AuthInput type="number" placeholder="How old are you?" value={age} onChange={e => setAge(e.target.value)} />
             </div>
 
             <div>
-              <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>COMPANION'S NAME</label>
-              <AuthInput placeholder="What name should they have?" value={companionName} onChange={e=>setCompanionName(e.target.value)} />
-              <span style={{ fontSize:11, color:"#b0a0a0", marginTop:3, display:"block" }}>Give them any name, like Luna, Leo, or Chloe.</span>
+              <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>COMPANION'S NAME</label>
+              <AuthInput placeholder="What name should they have?" value={companionName} onChange={e => setCompanionName(e.target.value)} />
+              <span style={{ fontSize: 11, color: "#b0a0a0", marginTop: 3, display: "block" }}>Give them any name, like Luna, Leo, or Chloe.</span>
             </div>
 
             <div>
-              <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>A LITTLE ABOUT YOU (BIO)</label>
+              <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>A LITTLE ABOUT YOU (BIO)</label>
               <textarea
                 placeholder="What should they know about you? E.g., your hobbies, what you do, or what makes you unique."
                 value={bio}
-                onChange={e=>setBio(e.target.value)}
+                onChange={e => setBio(e.target.value)}
                 style={{
-                  width:"100%", padding:"12px 14px", borderRadius:12, height:80,
-                  border:"1px solid #f0ddd8", background:"#fff8f6",
-                  fontSize:14, color:"#4a3232", fontFamily:"'DM Sans', sans-serif"
+                  width: "100%", padding: "12px 14px", borderRadius: 12, height: 80,
+                  border: "1px solid #f0ddd8", background: "#fff8f6",
+                  fontSize: 14, color: "#4a3232", fontFamily: "'DM Sans', sans-serif"
                 }}
               />
             </div>
 
+            <PersonalityPicker value={personality} onChange={setPersonality} />
+
             {error && (
-              <div style={{ background:"#fef0f0", border:"1px solid #f5c5c5", borderRadius:10, padding:"10px 14px", color:"#c07070", fontSize:13 }}>
+              <div style={{ background: "#fef0f0", border: "1px solid #f5c5c5", borderRadius: 10, padding: "10px 14px", color: "#c07070", fontSize: 13 }}>
                 {error}
               </div>
             )}
 
-            <div style={{ display:"flex", gap:10, marginTop:5 }}>
+            <div style={{ display: "flex", gap: 10, marginTop: 5 }}>
               <button
                 onClick={() => setStep(1)}
                 style={{
-                  flex:1, padding:"13px 15px", borderRadius:12, border:"1px solid #f0ddd8",
-                  background:"#ffffff", color:"#8a6f6f", cursor:"pointer",
-                  fontSize:14, fontWeight:500, fontFamily:"'DM Sans', sans-serif"
+                  flex: 1, padding: "13px 15px", borderRadius: 12, border: "1px solid #f0ddd8",
+                  background: "#ffffff", color: "#8a6f6f", cursor: "pointer",
+                  fontSize: 14, fontWeight: 500, fontFamily: "'DM Sans', sans-serif"
                 }}
               >
                 Back
@@ -609,10 +712,10 @@ function RegisterPage({ onLogin, switchToLogin }) {
                 onClick={submit}
                 disabled={loading}
                 style={{
-                  flex:2, padding:"13px 20px", borderRadius:12, border:"none",
+                  flex: 2, padding: "13px 20px", borderRadius: 12, border: "none",
                   background: loading ? "#f0e4e0" : "linear-gradient(135deg, #f7cac9, #e8b4b8)",
                   color: loading ? "#c0a0a0" : "#5a3a3a",
-                  fontSize:14, fontWeight:600, fontFamily:"'DM Sans', sans-serif",
+                  fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
                   cursor: loading ? "default" : "pointer"
                 }}
               >
@@ -633,6 +736,7 @@ function OnboardingPage({ user, onOnboardingComplete }) {
   const [age, setAge] = useState("");
   const [companionName, setCompanionName] = useState("Companion");
   const [bio, setBio] = useState("");
+  const [personality, setPersonality] = useState("warm_friendly");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -641,15 +745,16 @@ function OnboardingPage({ user, onOnboardingComplete }) {
     setLoading(true); setError(null);
     try {
       const res = await fetch(`${API}/auth/profile`, {
-        method:"PUT",
-        headers:{
-          "Content-Type":"application/json",
-          "Authorization":`Bearer ${getToken()}`
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getToken()}`
         },
-        body: JSON.stringify({ 
-          age: parseInt(age) || null, 
-          companion_name: companionName, 
-          bio 
+        body: JSON.stringify({
+          age: parseInt(age) || null,
+          companion_name: companionName,
+          bio,
+          personality,
         }),
       });
       const data = await res.json();
@@ -663,50 +768,52 @@ function OnboardingPage({ user, onOnboardingComplete }) {
   };
 
   return (
-    <div style={{ minHeight:"calc(100vh - 75px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}>
+    <div style={{ minHeight: "calc(100vh - 75px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
       <Blobs />
       <div style={{
-        width:"100%", maxWidth:480,
-        background:"rgba(255,252,250,0.95)", backdropFilter:"blur(12px)",
-        borderRadius:28, border:"1px solid rgba(240,220,215,0.7)",
-        boxShadow:"0 8px 40px rgba(180,120,120,0.1)",
-        padding:"36px 32px", animation:"slideIn 0.4s ease", zIndex:1
+        width: "100%", maxWidth: 480,
+        background: "rgba(255,252,250,0.95)", backdropFilter: "blur(12px)",
+        borderRadius: 28, border: "1px solid rgba(240,220,215,0.7)",
+        boxShadow: "0 8px 40px rgba(180,120,120,0.1)",
+        padding: "36px 32px", animation: "slideIn 0.4s ease", zIndex: 1
       }}>
-        <p style={{ fontFamily:"'Outfit', sans-serif", fontSize:22, fontWeight:600, color:"#4a3232", textAlign:"center", marginBottom:10 }}>
+        <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 22, fontWeight: 600, color: "#4a3232", textAlign: "center", marginBottom: 10 }}>
           Customize Your Companion 🌸
         </p>
-        <p style={{ fontSize:13, color:"#8a6f6f", lineHeight:1.5, textAlign:"center", marginBottom:24 }}>
-          Welcome, <strong style={{ color:"#c07070" }}>{user.name}</strong>! Let's fill out your preferences to make your AI companion experience fully customized.
+        <p style={{ fontSize: 13, color: "#8a6f6f", lineHeight: 1.5, textAlign: "center", marginBottom: 24 }}>
+          Welcome, <strong style={{ color: "#c07070" }}>{user.name}</strong>! Let's fill out your preferences to make your AI companion experience fully customized.
         </p>
 
-        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
-            <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>YOUR AGE</label>
-            <AuthInput type="number" placeholder="How old are you?" value={age} onChange={e=>setAge(e.target.value)} />
+            <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>YOUR AGE</label>
+            <AuthInput type="number" placeholder="How old are you?" value={age} onChange={e => setAge(e.target.value)} />
           </div>
 
           <div>
-            <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>COMPANION'S NAME</label>
-            <AuthInput placeholder="What name should they have?" value={companionName} onChange={e=>setCompanionName(e.target.value)} />
-            <span style={{ fontSize:11, color:"#b0a0a0", marginTop:3, display:"block" }}>Give them any name you'd like them to respond to.</span>
+            <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>COMPANION'S NAME</label>
+            <AuthInput placeholder="What name should they have?" value={companionName} onChange={e => setCompanionName(e.target.value)} />
+            <span style={{ fontSize: 11, color: "#b0a0a0", marginTop: 3, display: "block" }}>Give them any name you'd like them to respond to.</span>
           </div>
 
           <div>
-            <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>A LITTLE ABOUT YOU (BIO)</label>
+            <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>A LITTLE ABOUT YOU (BIO)</label>
             <textarea
               placeholder="Tell your companion what you enjoy, your interests, or what's currently going on in your life so they can customize their responses."
               value={bio}
-              onChange={e=>setBio(e.target.value)}
+              onChange={e => setBio(e.target.value)}
               style={{
-                width:"100%", padding:"12px 14px", borderRadius:12, height:80,
-                border:"1px solid #f0ddd8", background:"#fff8f6",
-                fontSize:14, color:"#4a3232", fontFamily:"'DM Sans', sans-serif"
+                width: "100%", padding: "12px 14px", borderRadius: 12, height: 80,
+                border: "1px solid #f0ddd8", background: "#fff8f6",
+                fontSize: 14, color: "#4a3232", fontFamily: "'DM Sans', sans-serif"
               }}
             />
           </div>
 
+          <PersonalityPicker value={personality} onChange={setPersonality} />
+
           {error && (
-            <div style={{ background:"#fef0f0", border:"1px solid #f5c5c5", borderRadius:10, padding:"10px 14px", color:"#c07070", fontSize:13 }}>
+            <div style={{ background: "#fef0f0", border: "1px solid #f5c5c5", borderRadius: 10, padding: "10px 14px", color: "#c07070", fontSize: 13 }}>
               {error}
             </div>
           )}
@@ -728,6 +835,7 @@ function SettingsModal({ user, onClose, onSave }) {
   const [age, setAge] = useState(user.age || "");
   const [companionName, setCompanionName] = useState(user.companion_name || "Companion");
   const [bio, setBio] = useState(user.bio || "");
+  const [personality, setPersonality] = useState(user.personality || "warm_friendly");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -736,16 +844,17 @@ function SettingsModal({ user, onClose, onSave }) {
     setLoading(true); setError(null);
     try {
       const res = await fetch(`${API}/auth/profile`, {
-        method:"PUT",
-        headers:{
-          "Content-Type":"application/json",
-          "Authorization":`Bearer ${getToken()}`
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getToken()}`
         },
-        body: JSON.stringify({ 
-          name, 
-          age: parseInt(age) || null, 
-          companion_name: companionName, 
-          bio 
+        body: JSON.stringify({
+          name,
+          age: parseInt(age) || null,
+          companion_name: companionName,
+          bio,
+          personality,
         }),
       });
       const data = await res.json();
@@ -760,72 +869,82 @@ function SettingsModal({ user, onClose, onSave }) {
   };
 
   return (
-    <div style={{
-      position:"fixed", top:0, left:0, right:0, bottom:0,
-      background:"rgba(74, 50, 50, 0.45)", backdropFilter:"blur(5px)",
-      display:"flex", alignItems:"center", justifyContent:"center",
-      zIndex:200, animation:"fadeIn 0.2s ease"
-    }}>
-      <div style={{
-        width:"100%", maxWidth:450, background:"#fffaf8", borderRadius:24,
-        padding:"30px", border:"1px solid rgba(240,220,215,0.8)",
-        boxShadow:"0 10px 40px rgba(0,0,0,0.15)", animation:"scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
-      }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
-          <h3 style={{ fontFamily:"'Outfit', sans-serif", fontSize:20, color:"#4a3232", fontWeight:600 }}>
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+        background: "rgba(74, 50, 50, 0.45)", backdropFilter: "blur(5px)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        zIndex: 200, animation: "fadeIn 0.2s ease",
+        overflowY: "auto", padding: "20px 16px",
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 450, background: "#fffaf8", borderRadius: 24,
+          padding: "30px", border: "1px solid rgba(240,220,215,0.8)",
+          boxShadow: "0 10px 40px rgba(0,0,0,0.15)", animation: "scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          maxHeight: "90vh", overflowY: "auto", margin: "auto",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: 20, color: "#4a3232", fontWeight: 600 }}>
             Companion Settings ⚙️
           </h3>
-          <button 
-            onClick={onClose} 
-            style={{ border:"none", background:"none", fontSize:20, cursor:"pointer", color:"#b09090" }}
+          <button
+            onClick={onClose}
+            style={{ border: "none", background: "none", fontSize: 20, cursor: "pointer", color: "#b09090" }}
           >
             ×
           </button>
         </div>
 
-        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div>
-            <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>YOUR NICKNAME</label>
-            <AuthInput placeholder="What should I call you?" value={name} onChange={e=>setName(e.target.value)} />
+            <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>YOUR NICKNAME</label>
+            <AuthInput placeholder="What should I call you?" value={name} onChange={e => setName(e.target.value)} />
           </div>
 
           <div>
-            <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>YOUR AGE</label>
-            <AuthInput type="number" placeholder="How old are you?" value={age} onChange={e=>setAge(e.target.value)} />
+            <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>YOUR AGE</label>
+            <AuthInput type="number" placeholder="How old are you?" value={age} onChange={e => setAge(e.target.value)} />
           </div>
 
           <div>
-            <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>COMPANION'S NAME</label>
-            <AuthInput placeholder="Name your companion" value={companionName} onChange={e=>setCompanionName(e.target.value)} />
+            <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>COMPANION'S NAME</label>
+            <AuthInput placeholder="Name your companion" value={companionName} onChange={e => setCompanionName(e.target.value)} />
           </div>
 
           <div>
-            <label style={{ fontSize:12, color:"#8a6f6f", fontWeight:600, display:"block", marginBottom:5 }}>ABOUT YOU (BIO)</label>
+            <label style={{ fontSize: 12, color: "#8a6f6f", fontWeight: 600, display: "block", marginBottom: 5 }}>ABOUT YOU (BIO)</label>
             <textarea
               placeholder="Details your companion should remember about you..."
               value={bio}
-              onChange={e=>setBio(e.target.value)}
+              onChange={e => setBio(e.target.value)}
               style={{
-                width:"100%", padding:"12px 14px", borderRadius:12, height:75,
-                border:"1px solid #f0ddd8", background:"#fff8f6",
-                fontSize:14, color:"#4a3232", fontFamily:"'DM Sans', sans-serif"
+                width: "100%", padding: "12px 14px", borderRadius: 12, height: 75,
+                border: "1px solid #f0ddd8", background: "#fff8f6",
+                fontSize: 14, color: "#4a3232", fontFamily: "'DM Sans', sans-serif"
               }}
             />
           </div>
 
+          <PersonalityPicker value={personality} onChange={setPersonality} />
+
           {error && (
-            <div style={{ background:"#fef0f0", border:"1px solid #f5c5c5", borderRadius:10, padding:"10px 14px", color:"#c07070", fontSize:13 }}>
+            <div style={{ background: "#fef0f0", border: "1px solid #f5c5c5", borderRadius: 10, padding: "10px 14px", color: "#c07070", fontSize: 13 }}>
               {error}
             </div>
           )}
 
-          <div style={{ display:"flex", gap:10, marginTop:10 }}>
+          <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
             <button
               onClick={onClose}
               style={{
-                flex:1, padding:"12px", borderRadius:12, border:"1px solid #f0ddd8",
-                background:"#ffffff", color:"#8a6f6f", cursor:"pointer",
-                fontSize:14, fontWeight:500, fontFamily:"'DM Sans', sans-serif"
+                flex: 1, padding: "12px", borderRadius: 12, border: "1px solid #f0ddd8",
+                background: "#ffffff", color: "#8a6f6f", cursor: "pointer",
+                fontSize: 14, fontWeight: 500, fontFamily: "'DM Sans', sans-serif"
               }}
             >
               Cancel
@@ -834,10 +953,10 @@ function SettingsModal({ user, onClose, onSave }) {
               onClick={save}
               disabled={loading}
               style={{
-                flex:2, padding:"12px", borderRadius:12, border:"none",
+                flex: 2, padding: "12px", borderRadius: 12, border: "none",
                 background: loading ? "#f0e4e0" : "linear-gradient(135deg, #f7cac9, #e8b4b8)",
                 color: loading ? "#c0a0a0" : "#5a3a3a",
-                fontSize:14, fontWeight:600, fontFamily:"'DM Sans', sans-serif",
+                fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
                 cursor: loading ? "default" : "pointer"
               }}
             >
@@ -853,14 +972,14 @@ function SettingsModal({ user, onClose, onSave }) {
 // ---------------------------------------------------------------------------
 // Auth wrapper page
 // ---------------------------------------------------------------------------
-function AuthPage({ onLogin, oauthError, initialMode="login" }) {
+function AuthPage({ onLogin, oauthError, initialMode = "login" }) {
   const [mode, setMode] = useState(initialMode);
   return (
-    <div style={{ minHeight:"calc(100vh - 75px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px 16px", position:"relative" }}>
+    <div style={{ minHeight: "calc(100vh - 75px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px", position: "relative" }}>
       <Blobs />
       {mode === "login"
-        ? <LoginPage onLogin={onLogin} switchToRegister={()=>setMode("register")} oauthError={oauthError} />
-        : <RegisterPage onLogin={onLogin} switchToLogin={()=>setMode("login")} />
+        ? <LoginPage onLogin={onLogin} switchToRegister={() => setMode("register")} oauthError={oauthError} />
+        : <RegisterPage onLogin={onLogin} switchToLogin={() => setMode("login")} />
       }
     </div>
   );
@@ -871,9 +990,9 @@ function AuthPage({ onLogin, oauthError, initialMode="login" }) {
 // ---------------------------------------------------------------------------
 function TypingIndicator() {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:6, padding:"12px 16px", background:"#fdf6f0", borderRadius:"18px 18px 18px 4px", width:"fit-content", maxWidth:80 }}>
-      {[0,1,2].map(i=>(
-        <span key={i} style={{ width:7, height:7, borderRadius:"50%", background:"#d4a0a0", display:"inline-block", animation:"bounce 1.2s infinite", animationDelay:`${i*0.2}s` }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 16px", background: "#fdf6f0", borderRadius: "18px 18px 18px 4px", width: "fit-content", maxWidth: 80 }}>
+      {[0, 1, 2].map(i => (
+        <span key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: "#d4a0a0", display: "inline-block", animation: "bounce 1.2s infinite", animationDelay: `${i * 0.2}s` }} />
       ))}
     </div>
   );
@@ -882,29 +1001,29 @@ function TypingIndicator() {
 function ChatMessage({ msg, companionName }) {
   const isUser = msg.role === "user";
   return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:isUser?"flex-end":"flex-start", marginBottom:18, animation:"fadeUp 0.3s ease" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: isUser ? "flex-end" : "flex-start", marginBottom: 18, animation: "fadeUp 0.3s ease" }}>
       {!isUser && (
-        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
-          <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg, #f7cac9, #c9e4de)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:600, color:"#8a6f6f" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+          <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #f7cac9, #c9e4de)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, color: "#8a6f6f" }}>
             🌸
           </div>
-          <span style={{ fontSize:12, color:"#b09090", fontFamily:"'DM Sans', sans-serif" }}>{companionName}</span>
+          <span style={{ fontSize: 12, color: "#b09090", fontFamily: "'DM Sans', sans-serif" }}>{companionName}</span>
         </div>
       )}
       <div style={{
-        maxWidth:"72%", padding:"11px 16px",
-        borderRadius: isUser?"18px 18px 4px 18px":"18px 18px 18px 4px",
-        background: isUser?"linear-gradient(135deg, #f7cac9 0%, #e8b4b8 100%)":"#fdf6f0",
-        color: isUser?"#5a3a3a":"#4a3a3a",
-        fontSize:15, lineHeight:1.6,
-        fontFamily:"'DM Sans', sans-serif",
-        border: isUser?"none":"1px solid #f0e0dc",
-        boxShadow:"0 1px 4px rgba(180,120,120,0.07)",
-        wordBreak:"break-word",
+        maxWidth: "72%", padding: "11px 16px",
+        borderRadius: isUser ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+        background: isUser ? "linear-gradient(135deg, #f7cac9 0%, #e8b4b8 100%)" : "#fdf6f0",
+        color: isUser ? "#5a3a3a" : "#4a3a3a",
+        fontSize: 15, lineHeight: 1.6,
+        fontFamily: "'DM Sans', sans-serif",
+        border: isUser ? "none" : "1px solid #f0e0dc",
+        boxShadow: "0 1px 4px rgba(180,120,120,0.07)",
+        wordBreak: "break-word",
       }}>
         {msg.text}
       </div>
-      <span style={{ fontSize:11, color:"#c0a8a8", marginTop:4 }}>{msg.time}</span>
+      <span style={{ fontSize: 11, color: "#c0a8a8", marginTop: 4 }}>{msg.time}</span>
     </div>
   );
 }
@@ -918,9 +1037,9 @@ function ChatPage({ user, onLogout, onUpdateUser }) {
 
   // Compute opening message based on user profile
   const openingMessage = {
-    id: 0, role:"assistant",
+    id: 0, role: "assistant",
     text: `Hey ${userNick} 🌸 I'm ${compName}. I'm so glad you're here! What's on your mind today?`,
-    time: new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }),
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   };
 
   const [messages, setMessages] = useState([openingMessage]);
@@ -932,8 +1051,8 @@ function ChatPage({ user, onLogout, onUpdateUser }) {
   const inputRef = useRef(null);
 
   const authHeaders = useCallback(() => ({
-    "Content-Type":"application/json",
-    "Authorization":`Bearer ${getToken()}`,
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${getToken()}`,
   }), []);
 
   // Update opening message text if user updates profile
@@ -959,30 +1078,30 @@ function ChatPage({ user, onLogout, onUpdateUser }) {
         if (!res.ok) return;
         const data = await res.json();
         if (data.messages?.length) {
-          setMessages([openingMessage, ...data.messages.map((m,i)=>({
-            id:i+1, role:m.role, text:m.content,
-            time: new Date(m.timestamp).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }),
+          setMessages([openingMessage, ...data.messages.map((m, i) => ({
+            id: i + 1, role: m.role, text: m.content,
+            time: new Date(m.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           }))]);
         }
-      } catch {}
+      } catch { }
     })();
   }, [authHeaders]);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages, loading]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
   const sendMessage = async () => {
     const text = input.trim();
     if (!text || loading) return;
-    const userMsg = { id:Date.now(), role:"user", text, time:new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }) };
-    setMessages(prev=>[...prev, userMsg]);
+    const userMsg = { id: Date.now(), role: "user", text, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) };
+    setMessages(prev => [...prev, userMsg]);
     setInput(""); setLoading(true); setError(null);
     try {
       const res = await fetch(`${API}/chat`, {
-        method:"POST", headers:authHeaders(), body:JSON.stringify({ message:text }),
+        method: "POST", headers: authHeaders(), body: JSON.stringify({ message: text }),
       });
       if (!res.ok) throw new Error(`Server error ${res.status}`);
       const data = await res.json();
-      setMessages(prev=>[...prev, { id:Date.now()+1, role:"assistant", text:data.response, time:new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }) }]);
+      setMessages(prev => [...prev, { id: Date.now() + 1, role: "assistant", text: data.response, time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }]);
     } catch (e) { setError("Couldn't reach the server. Is your backend running?"); }
     finally { setLoading(false); inputRef.current?.focus(); }
   };
@@ -990,56 +1109,56 @@ function ChatPage({ user, onLogout, onUpdateUser }) {
   const clearHistory = async () => {
     if (!window.confirm("Clear all chat history?")) return;
     try {
-      await fetch(`${API}/history`, { method:"DELETE", headers:authHeaders() });
+      await fetch(`${API}/history`, { method: "DELETE", headers: authHeaders() });
       setMessages([openingMessage]); setError(null);
     } catch { setError("Couldn't clear history. Try again?"); }
   };
 
   const reloadHistory = async () => {
     try {
-      const res = await fetch(`${API}/history`, { headers:authHeaders() });
+      const res = await fetch(`${API}/history`, { headers: authHeaders() });
       const data = await res.json();
       if (data.messages?.length) {
-        setMessages([openingMessage, ...data.messages.map((m,i)=>({ id:i+1, role:m.role, text:m.content, time:new Date(m.timestamp).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" }) }))]);
+        setMessages([openingMessage, ...data.messages.map((m, i) => ({ id: i + 1, role: m.role, text: m.content, time: new Date(m.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }))]);
       } else { setMessages([openingMessage]); }
     } catch { setError("Couldn't reload history."); }
   };
 
   return (
-    <div style={{ minHeight:"calc(100vh - 75px)", background:"linear-gradient(160deg, #fff5f3 0%, #fef0f5 50%, #f0f5fe 100%)", display:"flex", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}>
+    <div style={{ minHeight: "calc(100vh - 75px)", background: "linear-gradient(160deg, #fff5f3 0%, #fef0f5 50%, #f0f5fe 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
       <Blobs />
-      <div style={{ width:"100%", maxWidth:540, display:"flex", flexDirection:"column", height:"82vh", maxHeight:740, background:"rgba(255,252,250,0.88)", backdropFilter:"blur(12px)", borderRadius:28, border:"1px solid rgba(240,220,215,0.7)", boxShadow:"0 8px 40px rgba(180,120,120,0.1)", overflow:"hidden", animation:"fadeIn 0.5s ease", position:"relative", zIndex:1 }}>
+      <div style={{ width: "100%", maxWidth: 540, display: "flex", flexDirection: "column", height: "82vh", maxHeight: 740, background: "rgba(255,252,250,0.88)", backdropFilter: "blur(12px)", borderRadius: 28, border: "1px solid rgba(240,220,215,0.7)", boxShadow: "0 8px 40px rgba(180,120,120,0.1)", overflow: "hidden", animation: "fadeIn 0.5s ease", position: "relative", zIndex: 1 }}>
 
         {/* Header */}
-        <div style={{ padding:"16px 20px", borderBottom:"1px solid #f5e5e0", background:"rgba(255,250,248,0.92)", flexShrink:0 }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <div style={{ position:"relative" }}>
-                <div style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(135deg, #f7cac9, #c9e4de)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, fontWeight:700, color:"#8a6f6f" }}>
+        <div style={{ padding: "16px 20px", borderBottom: "1px solid #f5e5e0", background: "rgba(255,250,248,0.92)", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ position: "relative" }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, #f7cac9, #c9e4de)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 700, color: "#8a6f6f" }}>
                   🌸
                 </div>
-                <div style={{ position:"absolute", bottom:1, right:1, width:10, height:10, borderRadius:"50%", background:"#7dba9e", border:"2px solid #fffaf8" }} />
+                <div style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: "#7dba9e", border: "2px solid #fffaf8" }} />
               </div>
               <div>
-                <p style={{ fontFamily:"'Outfit', sans-serif", fontSize:18, fontWeight:600, color:"#4a3232" }}>
+                <p style={{ fontFamily: "'Outfit', sans-serif", fontSize: 18, fontWeight: 600, color: "#4a3232" }}>
                   {compName}
                 </p>
-                <p style={{ fontSize:11, color:"#b09090" }}>
-                  Active companion for <strong style={{ color:"#c07070" }}>{user.name}</strong>
+                <p style={{ fontSize: 11, color: "#b09090" }}>
+                  Active companion for <strong style={{ color: "#c07070" }}>{user.name}</strong>
                 </p>
               </div>
             </div>
 
-            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               {[
-                { label:"⚙️ Settings", title:"Companion Settings", onClick:() => setShowSettings(true), base:"#fff8f6", hover:"#f5e5e0", border:"#f0ddd8", color:"#8a6f6f" },
-                { label:"↻ Reload", title:"Reload history", onClick:reloadHistory, base:"#fff8f6", hover:"#f5e5e0", border:"#f0ddd8", color:"#8a6f6f" },
-                { label:"🗑 Clear", title:"Clear history", onClick:clearHistory, base:"#fef0f0", hover:"#fce5e5", border:"#f5c5c5", color:"#c07070" },
+                { label: "⚙️ Settings", title: "Companion Settings", onClick: () => setShowSettings(true), base: "#fff8f6", hover: "#f5e5e0", border: "#f0ddd8", color: "#8a6f6f" },
+                { label: "↻ Reload", title: "Reload history", onClick: reloadHistory, base: "#fff8f6", hover: "#f5e5e0", border: "#f0ddd8", color: "#8a6f6f" },
+                { label: "🗑 Clear", title: "Clear history", onClick: clearHistory, base: "#fef0f0", hover: "#fce5e5", border: "#f5c5c5", color: "#c07070" },
               ].map(btn => (
                 <button key={btn.label} onClick={btn.onClick} title={btn.title}
-                  style={{ padding:"6px 12px", fontSize:11, fontWeight:500, border:`1px solid ${btn.border}`, borderRadius:8, background:btn.base, color:btn.color, cursor:"pointer", fontFamily:"'DM Sans', sans-serif", transition:"all 0.2s" }}
-                  onMouseOver={e=>e.currentTarget.style.background=btn.hover}
-                  onMouseOut={e=>e.currentTarget.style.background=btn.base}
+                  style={{ padding: "6px 12px", fontSize: 11, fontWeight: 500, border: `1px solid ${btn.border}`, borderRadius: 8, background: btn.base, color: btn.color, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", transition: "all 0.2s" }}
+                  onMouseOver={e => e.currentTarget.style.background = btn.hover}
+                  onMouseOut={e => e.currentTarget.style.background = btn.base}
                 >
                   {btn.label}
                 </button>
@@ -1049,55 +1168,55 @@ function ChatPage({ user, onLogout, onUpdateUser }) {
         </div>
 
         {/* Messages */}
-        <div style={{ flex:1, overflowY:"auto", padding:"20px 20px 8px" }}>
-          {messages.map(msg=><ChatMessage key={msg.id} msg={msg} companionName={compName} />)}
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 8px" }}>
+          {messages.map(msg => <ChatMessage key={msg.id} msg={msg} companionName={compName} />)}
           {loading && (
-            <div style={{ marginBottom:18, animation:"fadeUp 0.3s ease" }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
-                <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg, #f7cac9, #c9e4de)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, color:"#8a6f6f" }}>🌸</div>
+            <div style={{ marginBottom: 18, animation: "fadeUp 0.3s ease" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg, #f7cac9, #c9e4de)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, color: "#8a6f6f" }}>🌸</div>
               </div>
               <TypingIndicator />
             </div>
           )}
-          {error && <div style={{ textAlign:"center", padding:"8px 16px", background:"#fef0f0", border:"1px solid #f5c5c5", borderRadius:12, color:"#c07070", fontSize:13, marginBottom:16 }}>{error}</div>}
+          {error && <div style={{ textAlign: "center", padding: "8px 16px", background: "#fef0f0", border: "1px solid #f5c5c5", borderRadius: 12, color: "#c07070", fontSize: 13, marginBottom: 16 }}>{error}</div>}
           <div ref={bottomRef} />
         </div>
 
         {/* Input */}
-        <div style={{ padding:"12px 16px 16px", borderTop:"1px solid #f5e5e0", background:"rgba(255,250,248,0.92)", flexShrink:0 }}>
-          <div style={{ display:"flex", alignItems:"flex-end", gap:10, background:"#fff8f6", border:"1px solid #f0ddd8", borderRadius:20, padding:"8px 8px 8px 16px" }}>
+        <div style={{ padding: "12px 16px 16px", borderTop: "1px solid #f5e5e0", background: "rgba(255,250,248,0.92)", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 10, background: "#fff8f6", border: "1px solid #f0ddd8", borderRadius: 20, padding: "8px 8px 8px 16px" }}>
             <textarea
               ref={inputRef}
               value={input}
-              onChange={e=>setInput(e.target.value)}
-              onKeyDown={e=>{ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();} }}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               placeholder={`Talk to ${compName}...`}
               rows={1}
-              style={{ flex:1, background:"transparent", border:"none", fontSize:15, color:"#4a3232", fontFamily:"'DM Sans', sans-serif", lineHeight:1.5, maxHeight:120, overflowY:"auto", paddingTop:4, paddingBottom:4 }}
-              onInput={e=>{ e.target.style.height="auto"; e.target.style.height=Math.min(e.target.scrollHeight,120)+"px"; }}
+              style={{ flex: 1, background: "transparent", border: "none", fontSize: 15, color: "#4a3232", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5, maxHeight: 120, overflowY: "auto", paddingTop: 4, paddingBottom: 4 }}
+              onInput={e => { e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"; }}
             />
             <button
               onClick={sendMessage}
-              disabled={loading||!input.trim()}
-              style={{ width:38, height:38, borderRadius:"50%", border:"none", background:input.trim()&&!loading?"linear-gradient(135deg, #f7cac9, #e8b4b8)":"#f0e4e0", cursor:input.trim()&&!loading?"pointer":"default", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"all 0.2s" }}
+              disabled={loading || !input.trim()}
+              style={{ width: 38, height: 38, borderRadius: "50%", border: "none", background: input.trim() && !loading ? "linear-gradient(135deg, #f7cac9, #e8b4b8)" : "#f0e4e0", cursor: input.trim() && !loading ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={input.trim()&&!loading?"#8a5a5a":"#c0a0a0"} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={input.trim() && !loading ? "#8a5a5a" : "#c0a0a0"} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
               </svg>
             </button>
           </div>
-          <p style={{ textAlign:"center", fontSize:11, color:"#c8b0b0", marginTop:10 }}>
-            {compName} is a friendly customized companion, not a licensed therapist. If you're in crisis, please reach out to a professional. 🌸
+          <p style={{ textAlign: "center", fontSize: 11, color: "#c8b0b0", marginTop: 10 }}>
+            Confide is a friendly AI companion, not a licensed therapist. If you're in crisis, please reach out to a professional. 🌸
           </p>
         </div>
 
       </div>
 
       {showSettings && (
-        <SettingsModal 
-          user={user} 
-          onClose={() => setShowSettings(false)} 
-          onSave={onUpdateUser} 
+        <SettingsModal
+          user={user}
+          onClose={() => setShowSettings(false)}
+          onSave={onUpdateUser}
         />
       )}
     </div>
@@ -1178,14 +1297,14 @@ export default function App() {
 
   if (!tokenChecked) {
     return (
-      <div style={{ minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <GlobalStyle />
         <Blobs />
-        <div style={{ textAlign:"center" }}>
-          <div style={{ width:48, height:48, borderRadius:"50%", background:"linear-gradient(135deg, #f7cac9, #c9e4de)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:20, fontWeight:700, color:"#8a6f6f", marginBottom:12 }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, borderRadius: "50%", background: "linear-gradient(135deg, #f7cac9, #c9e4de)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 700, color: "#8a6f6f", marginBottom: 12 }}>
             🌸
           </div>
-          <p style={{ fontFamily:"'DM Sans', sans-serif", color:"#b09090", fontSize:14 }}>Connecting space…</p>
+          <p style={{ fontFamily: "'DM Sans', sans-serif", color: "#b09090", fontSize: 14 }}>Connecting space…</p>
         </div>
       </div>
     );
@@ -1217,15 +1336,15 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
-      <Navbar 
+      <Navbar
         onNavigate={(p) => {
           if (user) {
             setPage(user.age === null ? "onboarding" : "chat");
           } else {
             setPage(p);
           }
-        }} 
-        currentPage={page} 
+        }}
+        currentPage={page}
         onLogout={handleLogout}
         user={user}
       />

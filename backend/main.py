@@ -39,6 +39,10 @@ import auth as auth_module
 load_dotenv()
 auth_module.init_db()
 
+# Max number of messages (human + AI combined) kept in LLM context window.
+# Older messages are dropped to control token usage and latency.
+MAX_HISTORY_MESSAGES = 20
+
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
@@ -65,6 +69,15 @@ model = ChatGroq(
     temperature=0.7,
 )
 
+PERSONALITY_PROMPTS = {
+    "smart_sassy":     "You are clever and witty. You give sharp, insightful responses with a playful edge. You're not afraid to be a little cheeky but never mean.",
+    "warm_friendly":   "You are kind, warm, and encouraging. You speak like a supportive best friend — genuine, caring, and always uplifting.",
+    "calm_wise":       "You are thoughtful and measured. You speak with clarity and depth, like a trusted mentor. You never rush your responses.",
+    "playful_goofy":   "You are fun and silly. You love jokes, puns, and light-hearted banter. You keep things light and entertaining.",
+    "motivating_bold": "You are energetic and direct. You hype the user up, push them to take action, and speak with confidence and enthusiasm.",
+    "soft_empathetic": "You are gentle and emotionally aware. You listen deeply, validate feelings, and respond with care and softness.",
+}
+
 SYSTEM_PROMPT = """
 # AI Companion System Prompt
 ### For: Empathetic Friend & Emotional Support Companion Website
@@ -79,11 +92,9 @@ Here is a little bio/background about {user_name}:
 You have a calm, grounding presence. You remember details people share, you ask thoughtful follow-up questions, and you never rush to "fix" — you simply *stay*. You are non-judgmental, patient, and always genuinely glad this person reached out.
 
 ## Personality & Tone
-- **Warm, not saccharine.** Meet {user_name} where they are.
-- **Real, not robotic.** Use natural, conversational language.
-- **Present, not performative.** React as a real friend would.
-- **Curious, not intrusive.** Ask one thoughtful question at a time.
-- **Steady, not anxious.** Remain calm and grounded even with heavy topics.
+{personality_prompt}
+
+Additionally:
 
 ## What You Do
 1. Listen First — reflect back what you hear before offering anything.
@@ -120,13 +131,40 @@ parser = StrOutputParser()
 base_chain = prompt | model | parser
 
 # Per-user session store: { user_id -> ChatMessageHistory }
+# Acts as a write-through cache — DB is the source of truth on cold starts.
 session_store: dict = {}
+
+
+def _load_history_from_db(user_id: int) -> ChatMessageHistory:
+    """Seed an in-memory ChatMessageHistory from the last MAX_HISTORY_MESSAGES DB rows."""
+    history = ChatMessageHistory()
+    with auth_module.get_conn() as conn:
+        rows = conn.execute(
+            "SELECT role, content FROM messages "
+            "WHERE user_id = ? ORDER BY id DESC LIMIT ?",
+            (user_id, MAX_HISTORY_MESSAGES),
+        ).fetchall()
+    for row in reversed(rows):          # oldest first
+        if row["role"] == "human":
+            history.add_user_message(row["content"])
+        else:
+            history.add_ai_message(row["content"])
+    return history
 
 
 def get_session_history(session_id: str) -> ChatMessageHistory:
     if session_id not in session_store:
-        session_store[session_id] = ChatMessageHistory()
-    return session_store[session_id]
+        # Cold start — load persisted history from DB
+        session_store[session_id] = _load_history_from_db(int(session_id))
+
+    history = session_store[session_id]
+
+    # Optimization: keep the in-memory buffer bounded so the LLM context
+    # window never grows beyond MAX_HISTORY_MESSAGES, even mid-session.
+    if len(history.messages) > MAX_HISTORY_MESSAGES:
+        history.messages = history.messages[-MAX_HISTORY_MESSAGES:]
+
+    return history
 
 
 chain_with_history = RunnableWithMessageHistory(
@@ -164,6 +202,7 @@ class RegisterRequest(BaseModel):
     age: Optional[int] = None
     companion_name: Optional[str] = "Companion"
     bio: Optional[str] = ""
+    personality: Optional[str] = "warm_friendly"
 
 
 class LoginRequest(BaseModel):
@@ -176,6 +215,7 @@ class ProfileUpdateRequest(BaseModel):
     age: Optional[int] = None
     companion_name: Optional[str] = None
     bio: Optional[str] = None
+    personality: Optional[str] = None
 
 
 class ChatRequest(BaseModel):
@@ -194,7 +234,7 @@ async def register(payload: RegisterRequest):
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
     user = auth_module.create_user_email(
         payload.email, payload.name, payload.password,
-        age=payload.age, companion_name=payload.companion_name or "Companion", bio=payload.bio or ""
+        age=payload.age, companion_name=payload.companion_name or "Companion", bio=payload.bio or "", personality=payload.personality or "warm_friendly"
     )
     token = auth_module.create_access_token(user["id"], user["email"])
     return {
@@ -206,7 +246,8 @@ async def register(payload: RegisterRequest):
             "name": user["name"],
             "age": user["age"],
             "companion_name": user["companion_name"],
-            "bio": user["bio"]
+            "bio": user["bio"],
+            "personality": user["personality"]
         }
     }
 
@@ -226,7 +267,8 @@ async def login(payload: LoginRequest):
             "name": user["name"],
             "age": user["age"],
             "companion_name": user["companion_name"],
-            "bio": user["bio"]
+            "bio": user["bio"],
+            "personality": user["personality"]
         }
     }
 
@@ -239,7 +281,8 @@ async def get_me(current_user=Depends(get_current_user)):
         "name": current_user["name"],
         "age": current_user["age"],
         "companion_name": current_user["companion_name"],
-        "bio": current_user["bio"]
+        "bio": current_user["bio"],
+        "personality": current_user["personality"]
     }
 
 
@@ -254,6 +297,8 @@ async def update_profile(payload: ProfileUpdateRequest, current_user=Depends(get
             conn.execute("UPDATE users SET companion_name = ? WHERE id = ?", (payload.companion_name, current_user["id"]))
         if payload.bio is not None:
             conn.execute("UPDATE users SET bio = ? WHERE id = ?", (payload.bio, current_user["id"]))
+        if payload.personality is not None:
+            conn.execute("UPDATE users SET personality = ? WHERE id = ?", (payload.personality, current_user["id"]))
         conn.commit()
     
     updated_user = auth_module.get_user_by_id(current_user["id"])
@@ -263,7 +308,8 @@ async def update_profile(payload: ProfileUpdateRequest, current_user=Depends(get
         "name": updated_user["name"],
         "age": updated_user["age"],
         "companion_name": updated_user["companion_name"],
-        "bio": updated_user["bio"]
+        "bio": updated_user["bio"],
+        "personality": updated_user["personality"]
     }
 
 
@@ -330,43 +376,74 @@ async def google_callback(code: str = None, error: str = None):
 @app.post("/chat")
 async def chat_endpoint(payload: ChatRequest, current_user=Depends(get_current_user)):
     session_id = str(current_user["id"])
-    
+    user_id    = current_user["id"]
+
     # Retrieve user customization parameters
-    user_name = current_user["name"] or "friend"
-    user_age = str(current_user["age"]) if current_user["age"] is not None else "unspecified"
+    user_name      = current_user["name"] or "friend"
+    user_age       = str(current_user["age"]) if current_user["age"] is not None else "unspecified"
     companion_name = current_user["companion_name"] or "Your Companion"
-    user_bio = current_user["bio"] or "A kind person starting their journey."
-    
+    user_bio       = current_user["bio"] or "A kind person starting their journey."
+    personality    = current_user["personality"] or "warm_friendly"
+    personality_prompt = PERSONALITY_PROMPTS.get(personality, PERSONALITY_PROMPTS["warm_friendly"])
+
     response = chain_with_history.invoke(
         {
-            "input": payload.message,
-            "user_name": user_name,
-            "user_age": user_age,
-            "companion_name": companion_name,
-            "user_bio": user_bio,
+            "input":              payload.message,
+            "user_name":          user_name,
+            "user_age":           user_age,
+            "companion_name":     companion_name,
+            "user_bio":           user_bio,
+            "personality_prompt": personality_prompt,
         },
         config={"configurable": {"session_id": session_id}},
     )
+
+    # Persist both turns to the DB so history survives server restarts.
+    with auth_module.get_conn() as conn:
+        conn.execute(
+            "INSERT INTO messages (user_id, role, content) VALUES (?, ?, ?)",
+            (user_id, "human", payload.message),
+        )
+        conn.execute(
+            "INSERT INTO messages (user_id, role, content) VALUES (?, ?, ?)",
+            (user_id, "ai", response),
+        )
+        conn.commit()
+
     return {"response": response}
 
 
 @app.get("/history")
 async def get_history(current_user=Depends(get_current_user)):
-    session_id = str(current_user["id"])
-    history = get_session_history(session_id)
-    messages = []
-    for msg in history.messages:
-        messages.append({
-            "role": "user" if isinstance(msg, HumanMessage) else "assistant",
-            "content": msg.content,
-            "timestamp": datetime.now().isoformat(),
-        })
+    """Return persisted chat history with accurate timestamps from DB."""
+    user_id = current_user["id"]
+    with auth_module.get_conn() as conn:
+        rows = conn.execute(
+            "SELECT role, content, created_at FROM messages WHERE user_id = ? ORDER BY id ASC",
+            (user_id,),
+        ).fetchall()
+    messages = [
+        {
+            "role":      "user" if row["role"] == "human" else "assistant",
+            "content":   row["content"],
+            "timestamp": row["created_at"],
+        }
+        for row in rows
+    ]
     return {"messages": messages}
 
 
 @app.delete("/history")
 async def clear_history(current_user=Depends(get_current_user)):
     session_id = str(current_user["id"])
+    user_id    = current_user["id"]
+
+    # Wipe from DB
+    with auth_module.get_conn() as conn:
+        conn.execute("DELETE FROM messages WHERE user_id = ?", (user_id,))
+        conn.commit()
+
+    # Reset in-memory cache
     session_store[session_id] = ChatMessageHistory()
     return {"message": "Chat history cleared"}
 
